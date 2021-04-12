@@ -91,7 +91,7 @@
 
 <script>
 export default {
-  data () {
+  data() {
     return {
       name: '',
       email: '',
@@ -100,7 +100,7 @@ export default {
     }
   },
   methods: {
-    handleSubmit () {
+    handleSubmit() {
       const data = JSON.stringify({
         name: this.name,
         email: this.email,

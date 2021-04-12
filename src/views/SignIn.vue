@@ -58,14 +58,14 @@
 
 <script>
 export default {
-  data () {
+  data() {
     return {
       email: '',
       password: ''
     }
   },
   methods: {
-    handleSubmit () {      
+    handleSubmit() {      
       const data = JSON.stringify({
         email: this.email,
         password: this.password
