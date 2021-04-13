@@ -1,5 +1,5 @@
 <template>
-  <div class="container py-5">
+  <div class="signupDiv container py-5">
     <form
       class="w-100"
       @submit.prevent.stop="handleSubmit"
@@ -114,7 +114,7 @@ export default {
 </script>
 
 <style>
-  .container {
+  .signupDiv {
     width: 600px;
     font-weight: 700;
   }
