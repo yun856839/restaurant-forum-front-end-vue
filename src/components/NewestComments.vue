@@ -1,27 +1,31 @@
 <template>
   <div class="card">
     <div class="card-header">
-      最新餐廳
+      最新評論
     </div>
     <div class="card-body">
 
-      <div v-for="rest in rests" :key="rest.id">
+      <div v-for="comment in comments" :key="comment.id">
         <h4>
-          <router-link to="#">{{ rest.name }}</router-link>
-          <small>{{ rest.Category ? rest.Category.name : '未分類' }}</small>
+          <router-link to="#">
+            {{ comment.Restaurant.name }}
+          </router-link>
         </h4>
-        <p>{{ rest.description }}</p>
-        {{ rest.createdAt | fromNow }}
+        <p>{{ comment.text }}</p>by
+        <router-link to="#">
+          {{ comment.User.name }}
+        </router-link>
+        {{ comment.createdAt | fromNow }}
         <hr>
       </div>
-      
+
     </div>
   </div>
 </template>
 
 <script>
 import moment from 'moment'
-export default {
+export default { 
   filters: {
     fromNow(value) {
       if (!value) {
@@ -31,16 +35,10 @@ export default {
     }
   },
   props: {
-    rests: {
+    comments: {
       type: Array,
       required: true
     }
   }
 }
 </script>
-
-<style scoped>
-  small {
-    font-size: 10px;
-  }
-</style>

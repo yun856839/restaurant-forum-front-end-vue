@@ -12,11 +12,12 @@
       <div class="col-md-6">
         <h3>最新餐廳</h3>
         <!-- 最新餐廳 NewestRestaurants -->
-        <NewestRestaurants :rests="restaurants"/>
+        <NewestRestaurants :rests="restaurants" />
       </div>
-      <div class="col-md-6">
-        <!-- 最新評論 NewestComments-->
+      <div class="col-md-6">        
         <h3>最新評論</h3>
+        <!-- 最新評論 NewestComments-->
+        <NewestComments :comments="comments" />
       </div>
     </div>
   </div>
@@ -26,6 +27,7 @@
 <script>
 import NavTabs from './../components/NavTabs'
 import NewestRestaurants from './../components/NewestRestaurants'
+import NewestComments from './../components/NewestComments'
 
 const dummyData = {
   'restaurants': [
@@ -538,7 +540,8 @@ export default {
   name: 'RestaurantsFeeds',
   components: {
     NavTabs,
-    NewestRestaurants
+    NewestRestaurants,
+    NewestComments
   },
   data() {
     return {
@@ -553,7 +556,7 @@ export default {
     fetchFeeds() {
       const { restaurants, comments } = dummyData
       this.restaurants = restaurants
-      this.comments = comments
+      this.comments = comments.filter(comment => comment.Restaurant && comment.text)
     }
   }  
 }
