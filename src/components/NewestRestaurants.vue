@@ -20,22 +20,16 @@
 </template>
 
 <script>
-import moment from 'moment'
-export default {
-  filters: {
-    fromNow(value) {
-      if (!value) {
-        return '-'
-      }
-      return moment(value).fromNow()
-    }
-  },
+import { fromNowFilter } from './../utils/mixins'
+
+export default {  
   props: {
     rests: {
       type: Array,
       required: true
     }
-  }
+  },
+  mixins: [fromNowFilter]  
 }
 </script>
 
