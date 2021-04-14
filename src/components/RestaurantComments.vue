@@ -10,6 +10,7 @@
           v-if="currentUser.isAdmin"
           type="button"
           class="btn btn-danger float-right"
+          @click.prevent.stop="handleDeleteButtonClick(comment.id)"
         >
           Delete
         </button>
@@ -53,6 +54,15 @@ export default {
       currentUser: dummyUser.currentUser
     }
   },
-  mixins: [fromNowFilter]  
+  mixins: [fromNowFilter],
+  methods: {
+    handleDeleteButtonClick(commentId) {
+      console.log('handleDeleteButtonClick', commentId)
+
+      // Todo: 透過 API 請求伺服器刪掉該筆 COMMENT
+      
+      this.$emit('after-delete-comment', commentId)
+    }
+  }  
 }
 </script>
