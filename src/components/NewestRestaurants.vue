@@ -6,8 +6,12 @@
     <div class="card-body">
 
       <div v-for="rest in rests" :key="rest.id">
-        <h4>
-          <router-link to="#">{{ rest.name }}</router-link>
+        <h4>        
+
+          <router-link :to="{ name: 'restaurant', params: { id: rest.id }}">
+            {{ rest.name }}
+          </router-link>
+
           <small>{{ rest.Category ? rest.Category.name : '未分類' }}</small>
         </h4>
         <p>{{ rest.description }}</p>
