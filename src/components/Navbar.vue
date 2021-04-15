@@ -1,9 +1,6 @@
 <template>
   <nav class="navbar navbar-expand-lg fixed-top navbar-light">
-    <router-link
-      to="/"
-      class="text-white navbar-brand btn btn-outline-info"      
-    >
+    <router-link to="/" class="text-white navbar-brand btn btn-outline-info">
       餐廳評論網
     </router-link>
 
@@ -19,40 +16,34 @@
       <span class="navbar-toggler-icon" />
     </button>
 
-    <div
-      id="navbarSupportedContent" 
-      class="navbar-collapse collapse"
-    >
+    <div id="navbarSupportedContent" class="navbar-collapse collapse">
       <div class="ml-auto d-flex align-items-center">
         <!-- if user is admin -->
         <p class="admin">
           <router-link
-              to="#" 
-              class="text-white mr-3 btn btn-outline-info"
-              v-if="currentUser.isAdmin"
+            to="#"
+            class="text-white mr-3 btn btn-outline-info"
+            v-if="currentUser.isAdmin"
           >
-          管理員後台
-        </router-link>
+            管理員後台
+          </router-link>
         </p>
 
         <template v-if="isAuthenticated">
           <p class="user">
-          <!-- is user is login -->
-              <router-link
-                to="#" 
-                class="text-white mr-3 btn btn-outline-info"
-              > 
-              {{ currentUser.name || '使用者' }} 您好
+            <!-- is user is login -->
+            <router-link
+              :to="{ name: 'user', params: { id: currentUser.id } }"
+              class="text-white mr-3 btn btn-outline-info"
+            >
+              {{ currentUser.name || "使用者" }} 您好
             </router-link>
           </p>
 
-          <button
-            type="button" 
-            class="btn btn-outline-danger my-2 my-sm-0"
-            >
+          <button type="button" class="btn btn-outline-danger my-2 my-sm-0">
             登出
-            </button>
-          </template>
+          </button>
+        </template>
       </div>
     </div>
   </nav>
@@ -64,50 +55,51 @@
 const dummyUser = {
   currentUser: {
     id: 1,
-    name: '管理者',
-    email: 'root@example.com',
-    image: 'https://i.pravatar.cc/300',
-    isAdmin: true
+    name: "管理者",
+    email: "root@example.com",
+    image: "https://i.pravatar.cc/300",
+    isAdmin: true,
   },
-  isAuthenticated: true
-}
+  isAuthenticated: true,
+};
 
 export default {
   data() {
     return {
       currentUser: {
         id: -1,
-        name: '',
-        email: '',
-        image: '',
-        isAdmin: false
+        name: "",
+        email: "",
+        image: "",
+        isAdmin: false,
       },
-      isAuthenticated: false  
-    }
+      isAuthenticated: false,
+    };
   },
   methods: {
     fetchUser() {
       this.currentUser = {
         ...this.currentUser, // 預設值
-        ...dummyUser.currentUser // 把上面的有重複蓋掉
-      }
-      this.isAuthenticated = dummyUser.isAuthenticated
-    }
+        ...dummyUser.currentUser, // 把上面的有重複蓋掉
+      };
+      this.isAuthenticated = dummyUser.isAuthenticated;
+    },
   },
   created() {
-    this.fetchUser()
-  }  
-}
+    this.fetchUser();
+  },
+};
 </script>
 
 <style>
-  .navbar {
-    background: skyblue;
-  }
-  p {
-    margin: 0;
-  }
-  .admin a, .user a{
-    text-decoration: none;
-  }  
+.navbar {
+  background: skyblue;
+}
+p {
+  margin: 0;
+}
+.admin a,
+.user a {
+  text-decoration: none;
+}
 </style>
