@@ -8,10 +8,10 @@
     </div>
     <div class="col-lg-4">
       <img
-        class="img-responsive center-block" 
-    :src="restaurant.image"
-        style="width: 250px;margin-bottom: 25px;"
-      >
+        class="img-responsive center-block"
+        :src="restaurant.image"
+        style="width: 250px; margin-bottom: 25px"
+      />
       <div class="contact-info-wrap">
         <ul class="list-unstyled">
           <li>
@@ -31,10 +31,11 @@
     </div>
     <div class="col-lg-8">
       <p>{{ restaurant.description }}</p>
-      <a
+      <router-link
         class="btn btn-primary btn-border mr-2"
-        href="#"
-      >Dashboard</a>
+        :to="{ name: 'restaurant-dashboard', params: { id: restaurant.id } }"
+        >Dashboard</router-link
+      >
 
       <button
         v-if="restaurant.isFavorited"
@@ -77,39 +78,39 @@ export default {
   props: {
     initialRestaurant: {
       type: Object,
-      required: true
-    }
+      required: true,
+    },
   },
   data() {
     return {
-      restaurant: this.initialRestaurant
-    }
+      restaurant: this.initialRestaurant,
+    };
   },
   methods: {
     addFavorite() {
       this.restaurant = {
-        ...this.restaurant, 
-        isFavorited: true
-      }
+        ...this.restaurant,
+        isFavorited: true,
+      };
     },
     deleteFavorite() {
       this.restaurant = {
-        ...this.restaurant, 
-        isFavorited: false
-      }
+        ...this.restaurant,
+        isFavorited: false,
+      };
     },
     addLike() {
       this.restaurant = {
         ...this.restaurant,
-        isLiked: true
-      }
+        isLiked: true,
+      };
     },
     deleteLike() {
       this.restaurant = {
         ...this.restaurant,
-        isLiked: false
-      }
-    }
-  }
-}
+        isLiked: false,
+      };
+    },
+  },
+};
 </script>
