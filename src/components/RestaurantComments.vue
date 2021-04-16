@@ -1,8 +1,6 @@
 <template>
   <div>
-    <h2 class="my-4">
-      所有評論：
-    </h2>
+    <h2 class="my-4">所有評論：</h2>
 
     <div v-for="comment in restaurantComments" :key="comment.id">
       <blockquote class="blockquote mb-0">
@@ -15,54 +13,54 @@
           Delete
         </button>
         <h3>
-          <a href="#">
+          <router-link :to="{ name: 'user', params: { id: comment.User.id } }">
             {{ comment.User.name }}
-          </a>
+          </router-link>
         </h3>
         <p>{{ comment.text }}</p>
         <footer class="blockquote-footer">
           {{ comment.createdAt | fromNow }}
         </footer>
       </blockquote>
-      <hr>
+      <hr />
     </div>
   </div>
 </template>
 
 <script>
-import { fromNowFilter } from './../utils/mixins'
+import { fromNowFilter } from "./../utils/mixins";
 
 const dummyUser = {
   currentUser: {
-    "id": 1,
-    "name": "root",
-    "email": "root@example.com",
-    "isAdmin": true
+    id: 1,
+    name: "root",
+    email: "root@example.com",
+    isAdmin: true,
   },
-  isAuthenticated: true        
-}
+  isAuthenticated: true,
+};
 export default {
-  name: 'restaurantComments',
-  props: {    
+  name: "restaurantComments",
+  props: {
     restaurantComments: {
       type: Array,
-      required: true
-    }
+      required: true,
+    },
   },
   data() {
     return {
-      currentUser: dummyUser.currentUser
-    }
+      currentUser: dummyUser.currentUser,
+    };
   },
   mixins: [fromNowFilter],
   methods: {
     handleDeleteButtonClick(commentId) {
-      console.log('handleDeleteButtonClick', commentId)
+      console.log("handleDeleteButtonClick", commentId);
 
       // Todo: 透過 API 請求伺服器刪掉該筆 COMMENT
-      
-      this.$emit('after-delete-comment', commentId)
-    }
-  }  
-}
+
+      this.$emit("after-delete-comment", commentId);
+    },
+  },
+};
 </script>

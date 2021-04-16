@@ -1,40 +1,37 @@
 <template>
   <div class="card">
-    <div class="card-header">
-      最新評論
-    </div>
+    <div class="card-header">最新評論</div>
     <div class="card-body">
-
       <div v-for="comment in comments" :key="comment.id">
-        <h4>  
-
-          <router-link :to="{ name: 'restaurant', params: { id: comment.Restaurant.id }}">
+        <h4>
+          <router-link
+            :to="{ name: 'restaurant', params: { id: comment.Restaurant.id } }"
+          >
             {{ comment.Restaurant.name }}
           </router-link>
-
         </h4>
-        <p>{{ comment.text }}</p>by
-        <router-link to="#">
+        <p>{{ comment.text }}</p>
+        by
+        <router-link :to="{ name: 'user', params: { id: comment.User.id } }">
           {{ comment.User.name }}
         </router-link>
         {{ comment.createdAt | fromNow }}
-        <hr>
+        <hr />
       </div>
-
     </div>
   </div>
 </template>
 
 <script>
-import { fromNowFilter } from './../utils/mixins'
+import { fromNowFilter } from "./../utils/mixins";
 
-export default {   
+export default {
   props: {
     comments: {
       type: Array,
-      required: true
-    }
+      required: true,
+    },
   },
-  mixins: [fromNowFilter]
-}
+  mixins: [fromNowFilter],
+};
 </script>
