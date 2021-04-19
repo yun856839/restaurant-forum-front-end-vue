@@ -21,7 +21,7 @@
         <!-- if user is admin -->
         <p class="admin">
           <router-link
-            to="#"
+            to="/admin/restaurants"
             class="text-white mr-3 btn btn-outline-info"
             v-if="currentUser.isAdmin"
           >
