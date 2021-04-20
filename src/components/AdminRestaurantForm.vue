@@ -26,7 +26,7 @@
         <option
           v-for="category in categories"
           :key="category.id"
-          value="category.id"
+          :value="category.id"
         >
           {{ category.name }}
         </option>
@@ -152,17 +152,27 @@ const dummyData = {
 
 export default {
   name: "AdminRestaurantForm",
+  props: {
+    initialRestaurant: {
+      type: Object,
+      default: () => {
+        return {
+          name: "",
+          tel: "",
+          address: "",
+          openingHours: "",
+          description: "",
+          image: "",
+          categoryId: "",
+        };
+      },
+    },
+  },
   data() {
     return {
       categories: [],
       restaurant: {
-        name: "",
-        categoryId: "",
-        tel: "",
-        address: "",
-        description: "",
-        image: "",
-        openingHours: "",
+        ...this.initialRestaurant,
       },
     };
   },
