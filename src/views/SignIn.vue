@@ -2,9 +2,7 @@
   <div class="signupDiv container py-5">
     <form class="w-100" @submit.prevent.stop="handleSubmit">
       <div class="text-center mb-4">
-        <h1 class="title h3 mb-3 font-weight-normal">
-          Sign In
-        </h1>
+        <h1 class="title h3 mb-3 font-weight-normal">Sign In</h1>
       </div>
 
       <div class="form-label-group mb-2">
@@ -19,7 +17,7 @@
           autocomplete="username"
           required
           autofocus
-        >
+        />
       </div>
 
       <div class="form-label-group mb-3">
@@ -33,10 +31,11 @@
           placeholder="Password"
           autocomplete="current-password"
           required
-        >
+        />
       </div>
 
       <button
+        :disabled="isProcessing"
         class="btn btn-lg btn-info btn-block mb-3"
         type="submit"
       >
@@ -49,47 +48,76 @@
         </p>
       </div>
 
-      <p class="mt-5 mb-3 text-muted text-center">
-        &copy; 2021
-      </p>
+      <p class="mt-5 mb-3 text-muted text-center">&copy; 2021</p>
     </form>
   </div>
 </template>
 
 <script>
+import authorizationAPI from "./../apis/authorization";
+import { Toast } from "./../utils/helpers";
+
 export default {
   data() {
     return {
-      email: '',
-      password: ''
-    }
+      email: "",
+      password: "",
+      isProcessing: false,
+    };
   },
   methods: {
-    handleSubmit() {      
-      const data = JSON.stringify({
-        email: this.email,
-        password: this.password
-      })
-      console.log('data', data)
-    }
-  }
-}
+    async handleSubmit() {
+      try {
+        if (!this.email || !this.password) {
+          Toast.fire({
+            icon: "error",
+            title: "Please enter Email or Password !",
+          });
+          return;
+        }
+
+        this.isProcessing = true;
+
+        const res = await authorizationAPI.signIn({
+          email: this.email,
+          password: this.password,
+        });
+        const { data } = res;
+
+        if (data.status !== "success") {
+          throw new Error(data.message);
+        }
+
+        localStorage.setItem("token", data.token);
+        this.$router.push("/restaurants");
+      } catch (err) {
+        this.isProcessing = false;
+        this.password = "";
+        Toast.fire({
+          icon: "error",
+          title: "Wrong Email or Password !",
+        });
+        console.log("err", err);
+      }
+    },
+  },
+};
 </script>
 
 <style>
-  .signupDiv {
-    width: 600px;
-    font-weight: 700;
-  }
-  .title {
-    color: red;
-    background: snow;
-  }
-  .signup a {
-    text-decoration: none;
-    color: red;
-  }
-  .signup:first-child:hover  {
-    border: 1px solid skyblue
-  }
+.signupDiv {
+  width: 600px;
+  font-weight: 700;
+}
+.title {
+  color: red;
+  background: snow;
+}
+.signup a {
+  text-decoration: none;
+  color: red;
+}
+.signup:first-child:hover {
+  border: 1px solid skyblue;
+}
 </style>
