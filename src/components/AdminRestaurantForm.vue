@@ -1,5 +1,5 @@
 <template>
-  <form @submit.prevent.stop="handleSubmit">
+  <form v-show="!isLoading" @submit.prevent.stop="handleSubmit">
     <div class="form-group">
       <label for="name">Name</label>
       <input
@@ -98,57 +98,15 @@
       />
     </div>
 
-    <button type="submit" class="btn btn-primary">送出</button>
+    <button :disabled="isProcessing" type="submit" class="btn btn-primary">
+      {{ isProcessing ? "處理中" : "送出" }}
+    </button>
   </form>
 </template>
 
 <script>
-const dummyData = {
-  categories: [
-    {
-      id: 1,
-      name: "中式料理",
-      createdAt: "2021-02-15T13:04:34.000Z",
-      updatedAt: "2021-02-15T13:04:34.000Z",
-    },
-    {
-      id: 11,
-      name: "日本料理",
-      createdAt: "2021-02-15T13:04:34.000Z",
-      updatedAt: "2021-02-15T13:04:34.000Z",
-    },
-    {
-      id: 21,
-      name: "義大利料理",
-      createdAt: "2021-02-15T13:04:34.000Z",
-      updatedAt: "2021-02-15T13:04:34.000Z",
-    },
-    {
-      id: 31,
-      name: "墨西哥料理",
-      createdAt: "2021-02-15T13:04:34.000Z",
-      updatedAt: "2021-02-15T13:04:34.000Z",
-    },
-    {
-      id: 41,
-      name: "素食料理",
-      createdAt: "2021-02-15T13:04:34.000Z",
-      updatedAt: "2021-02-15T13:04:34.000Z",
-    },
-    {
-      id: 51,
-      name: "美式料理",
-      createdAt: "2021-02-15T13:04:34.000Z",
-      updatedAt: "2021-02-15T13:04:34.000Z",
-    },
-    {
-      id: 61,
-      name: "複合式料理",
-      createdAt: "2021-02-15T13:04:34.000Z",
-      updatedAt: "2021-02-15T13:04:34.000Z",
-    },
-  ],
-};
+import adminAPI from "./../apis/admin";
+import { Toast } from "./../utils/helpers";
 
 export default {
   name: "AdminRestaurantForm",
@@ -167,6 +125,10 @@ export default {
         };
       },
     },
+    isProcessing: {
+      type: Boolean,
+      default: false,
+    },
   },
   data() {
     return {
@@ -174,14 +136,30 @@ export default {
       restaurant: {
         ...this.initialRestaurant,
       },
+      isLoading: true,
     };
   },
   created() {
     this.fetchCategories();
   },
   methods: {
-    fetchCategories() {
-      this.categories = dummyData.categories;
+    async fetchCategories() {
+      try {
+        const { data } = await adminAPI.categories.get();
+
+        if (data.status === "error") {
+          throw new Error(data.message);
+        }
+
+        this.categories = data.categories;
+        this.isLoading = false;
+      } catch (err) {
+        this.isLoading = false;
+        Toast.fire({
+          icon: "error",
+          title: "Can not get categories data. Try later.",
+        });
+      }
     },
     handleFileChange(e) {
       const { files } = e.target;
@@ -195,6 +173,21 @@ export default {
       }
     },
     handleSubmit(e) {
+      if (!this.restaurant.name) {
+        Toast.fire({
+          icon: "warning",
+          title: "Please enter restaurant name.",
+        });
+        return;
+      }
+      if (!this.restaurant.categoryId) {
+        Toast.fire({
+          icon: "warning",
+          title: "Please enter category.",
+        });
+        return;
+      }
+
       const form = e.target;
       const formData = new FormData(form);
       this.$emit("after-submit", formData);
