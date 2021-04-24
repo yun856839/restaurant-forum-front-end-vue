@@ -34,6 +34,10 @@ export default {
         }
 
         this.$router.push({ name: "admin-restaurants" });
+        Toast.fire({
+          icon: "success",
+          title: "Create restaurant successed !",
+        });
       } catch (err) {
         this.isProcessing = false;
         Toast.fire({
