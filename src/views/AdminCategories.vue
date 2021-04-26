@@ -14,6 +14,7 @@
         </div>
         <div class="col-auto">
           <button
+            :disabled="isProcessing"
             @click.prevent.stop="createCategory"
             type="button"
             class="btn btn-primary"
@@ -94,55 +95,9 @@
 </template>
 
 <script>
-import { v4 as uuidv4 } from "uuid";
 import AdminNav from "../components/AdminNav";
-
-const dummyData = {
-  categories: [
-    {
-      id: 1,
-      name: "中式料理",
-      createdAt: "2021-02-15T13:04:34.000Z",
-      updatedAt: "2021-02-15T13:04:34.000Z",
-    },
-    {
-      id: 11,
-      name: "日本料理",
-      createdAt: "2021-02-15T13:04:34.000Z",
-      updatedAt: "2021-02-15T13:04:34.000Z",
-    },
-    {
-      id: 21,
-      name: "義大利料理",
-      createdAt: "2021-02-15T13:04:34.000Z",
-      updatedAt: "2021-02-15T13:04:34.000Z",
-    },
-    {
-      id: 31,
-      name: "墨西哥料理",
-      createdAt: "2021-02-15T13:04:34.000Z",
-      updatedAt: "2021-02-15T13:04:34.000Z",
-    },
-    {
-      id: 41,
-      name: "素食料理",
-      createdAt: "2021-02-15T13:04:34.000Z",
-      updatedAt: "2021-02-15T13:04:34.000Z",
-    },
-    {
-      id: 51,
-      name: "美式料理",
-      createdAt: "2021-02-15T13:04:34.000Z",
-      updatedAt: "2021-02-15T13:04:34.000Z",
-    },
-    {
-      id: 61,
-      name: "複合式料理",
-      createdAt: "2021-02-15T13:04:34.000Z",
-      updatedAt: "2021-02-15T13:04:34.000Z",
-    },
-  ],
-};
+import adminAPI from "./../apis/admin";
+import { Toast } from "./../utils/helpers";
 
 export default {
   name: "AdminCategories",
@@ -153,34 +108,85 @@ export default {
     return {
       categories: [],
       newCategoryName: "",
+      isProcessing: false,
     };
   },
   created() {
     this.fetchCategories();
   },
   methods: {
-    fetchCategories() {
-      this.categories = dummyData.categories.map((category) => ({
-        ...category,
-        isEditing: false,
-        nameCached: "",
-      }));
-    },
-    createCategory() {
-      // TODO: 透過 API 向後端伺服器'新增'類別
+    async fetchCategories() {
+      try {
+        const { data } = await adminAPI.categories.get();
 
-      this.categories.push({
-        id: uuidv4(),
-        name: this.newCategoryName,
-      });
-      this.newCategoryName = "";
-    },
-    deleteCategory(categoryId) {
-      // TODO: 透過 API 向後端伺服器'刪除'類別
+        if (data.status === "error") {
+          throw new Error(data.message);
+        }
 
-      this.categories = this.categories.filter(
-        (category) => category.id !== categoryId
-      );
+        this.categories = data.categories.map((category) => ({
+          ...category,
+          isEditing: false,
+          nameCached: "",
+        }));
+      } catch (err) {
+        Toast.fire({
+          icon: "error",
+          title: "Can not get categories data. Try later.",
+        });
+      }
+    },
+    async createCategory() {
+      try {
+        this.isProcessing = true;
+        const { data } = await adminAPI.categories.create({
+          name: this.newCategoryName,
+        });
+
+        if (data.status === "error") {
+          throw new Error(data.message);
+        }
+
+        this.categories.push({
+          id: data.categoryId,
+          name: this.newCategoryName,
+          isEditing: false,
+        });
+        Toast.fire({
+          icon: "success",
+          title: "Create category successed !",
+        });
+        this.isProcessing = false;
+        this.newCategoryName = "";
+      } catch (err) {
+        this.isProcessing = false;
+        Toast.fire({
+          icon: "error",
+          title: "Can not create category. Try later.",
+        });
+      }
+    },
+    async deleteCategory(categoryId) {
+      try {
+        const { data } = await adminAPI.categories.delete({ categoryId });
+
+        if (data.status === "error") {
+          throw new Error(data.message);
+        }
+
+        this.categories = this.categories.filter(
+          (category) => category.id !== categoryId
+        );
+
+        Toast.fire({
+          icon: "success",
+          title: "Delete category successed !",
+        });
+      } catch (err) {
+        Toast.fire({
+          icon: "error",
+          title: "Can not delete category. Try later.",
+        });
+      }
     },
     toggleIsEditing(categoryId) {
       this.categories = this.categories.map((category) => {
@@ -194,11 +200,21 @@ export default {
         return category;
       });
     },
-    updatedCategory({ categoryId, name }) {
-      // TODO: 透過 API 向後端伺服器'更新'類別
+    async updatedCategory({ categoryId, name }) {
+      try {
+        const { data } = await adminAPI.categories.update({ categoryId, name });
 
-      this.toggleIsEditing(categoryId);
-      console.log("updatedCategory Name", name);
+        if (data.status === "error") {
+          throw new Error(data.message);
+        }
+
+        this.toggleIsEditing(categoryId);
+      } catch (err) {
+        Toast.fire({
+          icon: "error",
+          title: "Can not edit category. Try later.",
+        });
+      }
     },
     handleCancel(categoryId) {
       this.categories = this.categories.map((category) => {

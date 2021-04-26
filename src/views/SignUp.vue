@@ -1,13 +1,8 @@
 <template>
   <div class="signupDiv container py-5">
-    <form
-      class="w-100"
-      @submit.prevent.stop="handleSubmit"
-    >
+    <form class="w-100" @submit.prevent.stop="handleSubmit">
       <div class="text-center mb-4">
-        <h1 class="title h3 mb-3 font-weight-normal">
-          Sign Up
-        </h1>
+        <h1 class="title h3 mb-3 font-weight-normal">Sign Up</h1>
       </div>
 
       <div class="form-label-group mb-2">
@@ -22,7 +17,7 @@
           autocomplete="username"
           required
           autofocus
-        >
+        />
       </div>
 
       <div class="form-label-group mb-2">
@@ -36,7 +31,7 @@
           placeholder="email"
           autocomplete="email"
           required
-        >
+        />
       </div>
 
       <div class="form-label-group mb-3">
@@ -50,7 +45,7 @@
           placeholder="Password"
           autocomplete="new-password"
           required
-        >
+        />
       </div>
 
       <div class="form-label-group mb-3">
@@ -64,10 +59,11 @@
           placeholder="Password"
           autocomplete="new-password"
           required
-        >
+        />
       </div>
 
       <button
+        :disabled="isProcessing"
         class="btn btn-lg btn-info btn-block mb-3"
         type="submit"
       >
@@ -76,57 +72,97 @@
 
       <div class="text-center mb-3">
         <p class="signin">
-          <router-link to="/signin">
-            Sign In
-          </router-link>
+          <router-link to="/signin"> Sign In </router-link>
         </p>
       </div>
 
-      <p class="mt-5 mb-3 text-muted text-center">
-        © 2021
-      </p>
+      <p class="mt-5 mb-3 text-muted text-center">© 2021</p>
     </form>
   </div>
 </template>
 
 <script>
+import authorizationAPI from "./../apis/authorization";
+import { Toast } from "./../utils/helpers";
+
 export default {
   data() {
     return {
-      name: '',
-      email: '',
-      password: '',
-      passwordCheck: ''
-    }
+      name: "",
+      email: "",
+      password: "",
+      passwordCheck: "",
+      isProcessing: false,
+    };
   },
   methods: {
-    handleSubmit() {
-      const data = JSON.stringify({
-        name: this.name,
-        email: this.email,
-        password: this.password,
-        passwordCheck: this.passwordCheck
-      })      
-      console.log('data', data)
-    }
-  }
-}
+    async handleSubmit() {
+      this.isProcessing = true;
+      try {
+        if (
+          !this.name ||
+          !this.email ||
+          !this.password ||
+          !this.passwordCheck
+        ) {
+          Toast.fire({
+            icon: "warning",
+            title: "Can not be empty.",
+          });
+          return;
+        }
+
+        if (this.password !== this.passwordCheck) {
+          Toast.fire({
+            icon: "warning",
+            title: "Password & PasswordCheck different.",
+          });
+          return;
+        }
+
+        const { data } = await authorizationAPI.signUp({
+          name: this.name,
+          email: this.email,
+          password: this.password,
+          passwordCheck: this.passwordCheck,
+        });
+
+        if (data.status === "error") {
+          throw new Error(data.message);
+        }
+
+        this.$router.push("/signin");
+
+        Toast.fire({
+          icon: "success",
+          title: data.message,
+        });
+      } catch (err) {
+        this.isProcessing = false;
+        Toast.fire({
+          icon: "error",
+          title: "Can not signUp. Try later.",
+        });
+      }
+    },
+  },
+};
 </script>
 
 <style>
-  .signupDiv {
-    width: 600px;
-    font-weight: 700;
-  }
-  .title {
-    color: red;
-    background: snow;
-  }
-  .signin a {
-    text-decoration: none;
-    color: red;
-  }
-  .signin:first-child:hover  {
-    border: 1px solid skyblue
-  }
+.signupDiv {
+  width: 600px;
+  font-weight: 700;
+}
+.title {
+  color: red;
+  background: snow;
+}
+.signin a {
+  text-decoration: none;
+  color: red;
+}
+.signin:first-child:hover {
+  border: 1px solid skyblue;
+}
 </style>
