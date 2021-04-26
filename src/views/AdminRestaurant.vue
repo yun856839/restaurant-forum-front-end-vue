@@ -43,30 +43,8 @@
 
 <script>
 import { emptyImageFilter } from "./../utils/mixins";
-
-const dummyData = {
-  data: {
-    restaurant: {
-      id: 1,
-      name: "Jeanette Towne",
-      tel: "0120456789",
-      address: "178 Andreanne Gateway",
-      opening_hours: "08:00",
-      description: "tenetur ut repellat",
-      image: "https://i.imgur.com/MIdlANq.jpeg",
-      CategoryId: 61,
-      viewCounts: 19,
-      createdAt: "2021-02-15T13:04:35.000Z",
-      updatedAt: "2021-04-14T07:50:48.000Z",
-      Category: {
-        id: 61,
-        name: "複合式料理",
-        createdAt: "2021-02-15T13:04:34.000Z",
-        updatedAt: "2021-02-15T13:04:34.000Z",
-      },
-    },
-  },
-};
+import adminAPI from "./../apis/admin";
+import { Toast } from "./../utils/helpers";
 
 export default {
   name: "AdminRestaurant",
@@ -89,31 +67,48 @@ export default {
     const { id: restaurantId } = this.$route.params;
     this.fetchRestaurant(restaurantId);
   },
+  beforeRouteUpdate(to, from, next) {
+    const { id } = to.params;
+    this.fetchRestaurant(id);
+    next();
+  },
   methods: {
-    fetchRestaurant(restaurantId) {
-      console.log("admin restaurantId", restaurantId);
-      const { restaurant } = dummyData.data;
-      const {
-        id,
-        name,
-        tel,
-        address,
-        opening_hours: openingHours,
-        description,
-        image,
-        Category,
-      } = restaurant;
-      this.restaurant = {
-        ...this.restaurant,
-        id,
-        name,
-        tel,
-        address,
-        openingHours,
-        description,
-        image,
-        categoryName: Category ? Category.name : "未分類",
-      };
+    async fetchRestaurant(restaurantId) {
+      try {
+        const { data } = await adminAPI.restaurants.getDetail({ restaurantId });
+
+        if (data.data.status === "error") {
+          throw new Error(data.message);
+        }
+
+        const { restaurant } = data.data;
+        const {
+          id,
+          name,
+          tel,
+          address,
+          opening_hours: openingHours,
+          description,
+          image,
+          Category,
+        } = restaurant;
+        this.restaurant = {
+          ...this.restaurant,
+          id,
+          name,
+          tel,
+          address,
+          openingHours,
+          description,
+          image,
+          categoryName: Category ? Category.name : "未分類",
+        };
+      } catch (err) {
+        Toast.fire({
+          icon: "error",
+          title: "Can not get restaurant data. Try later.",
+        });
+      }
     },
   },
 };
