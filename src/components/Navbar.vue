@@ -50,43 +50,11 @@
 </template>
 
 <script>
-/* eslint-disable */
-// 模擬 API 內容
-const dummyUser = {
-  currentUser: {
-    id: 1,
-    name: "管理者",
-    email: "root@example.com",
-    image: "https://i.pravatar.cc/300",
-    isAdmin: true,
-  },
-  isAuthenticated: true,
-};
+import { mapState } from "vuex";
 
 export default {
-  data() {
-    return {
-      currentUser: {
-        id: -1,
-        name: "",
-        email: "",
-        image: "",
-        isAdmin: false,
-      },
-      isAuthenticated: false,
-    };
-  },
-  methods: {
-    fetchUser() {
-      this.currentUser = {
-        ...this.currentUser, // 預設值
-        ...dummyUser.currentUser, // 把上面的有重複蓋掉
-      };
-      this.isAuthenticated = dummyUser.isAuthenticated;
-    },
-  },
-  created() {
-    this.fetchUser();
+  computed: {
+    ...mapState(["currentUser", "isAuthenticated"]),
   },
 };
 </script>
