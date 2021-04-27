@@ -5,6 +5,7 @@
     <div v-for="comment in restaurantComments" :key="comment.id">
       <blockquote class="blockquote mb-0">
         <button
+          :disabled="isProcessing"
           v-if="currentUser.isAdmin"
           type="button"
           class="btn btn-danger float-right"
@@ -29,16 +30,10 @@
 
 <script>
 import { fromNowFilter } from "./../utils/mixins";
+import commentsAPI from "./../apis/comments";
+import { Toast } from "./../utils/helpers";
+import { mapState } from "vuex";
 
-const dummyUser = {
-  currentUser: {
-    id: 1,
-    name: "root",
-    email: "root@example.com",
-    isAdmin: true,
-  },
-  isAuthenticated: true,
-};
 export default {
   name: "restaurantComments",
   props: {
@@ -49,17 +44,37 @@ export default {
   },
   data() {
     return {
-      currentUser: dummyUser.currentUser,
+      isProcessing: false,
     };
+  },
+  computed: {
+    ...mapState(["currentUser"]),
   },
   mixins: [fromNowFilter],
   methods: {
-    handleDeleteButtonClick(commentId) {
-      console.log("handleDeleteButtonClick", commentId);
+    async handleDeleteButtonClick(commentId) {
+      try {
+        this.isProcessing = true;
+        const { data } = await commentsAPI.delete({ commentId });
 
-      // Todo: 透過 API 請求伺服器刪掉該筆 COMMENT
+        if (data.status === "error") {
+          throw new Error(data.message);
+        }
 
-      this.$emit("after-delete-comment", commentId);
+        this.$emit("after-delete-comment", commentId);
+
+        Toast.fire({
+          icon: "success",
+          title: "Delete comment successed !",
+        });
+        this.isProcessing = false;
+      } catch (err) {
+        this.isProcessing = false;
+        Toast.fire({
+          icon: "error",
+          title: "Can not delete comment. Try later.",
+        });
+      }
     },
   },
 };
