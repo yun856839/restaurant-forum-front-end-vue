@@ -60,6 +60,8 @@
 
 <script>
 import { emptyImageFilter } from "./../utils/mixins";
+import usersAPI from "./../apis/users";
+import { Toast } from "./../utils/helpers";
 
 export default {
   mixins: [emptyImageFilter],
@@ -82,14 +84,43 @@ export default {
       isFollowed: this.initialIsFollowed,
     };
   },
-  methods: {
-    addFollowing(userId) {
-      console.log("userProfile add userId", userId);
-      this.isFollowed = true;
+  watch: {
+    initialIsFollowed(isFollowed) {
+      this.isFollowed = isFollowed;
     },
-    deleteFollowing(userId) {
-      console.log("userProfile delete userId", userId);
-      this.isFollowed = false;
+  },
+  methods: {
+    async addFollowing(userId) {
+      try {
+        const { data } = await usersAPI.addFollowing({ userId });
+
+        if (data.status === "error") {
+          throw new Error(data.message);
+        }
+
+        this.isFollowed = true;
+      } catch (err) {
+        Toast.fire({
+          icon: "error",
+          title: "Can not add following. Try later.",
+        });
+      }
+    },
+    async deleteFollowing(userId) {
+      try {
+        const { data } = await usersAPI.deleteFollowing({ userId });
+
+        if (data.status === "error") {
+          throw new Error(data.message);
+        }
+
+        this.isFollowed = false;
+      } catch (err) {
+        Toast.fire({
+          icon: "error",
+          title: "Can not delete following. Try later.",
+        });
+      }
     },
   },
 };
