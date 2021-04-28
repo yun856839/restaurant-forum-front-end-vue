@@ -37,61 +37,9 @@
 
 <script>
 import AdminNav from "./../components/AdminNav";
-
-const dummyData = {
-  users: [
-    {
-      id: 1,
-      name: "root",
-      email: "root@example.com",
-      password: "$2a$10$16ClPTh28gde/3TnBX6N8eP4Em0trhb7GBhcMwohulJsU9ponGPhK",
-      isAdmin: 1,
-      image: "https://i.imgur.com/5XlJtEs.jpg",
-      createdAt: "2021-02-15T13:04:33.000Z",
-      updatedAt: "2021-02-15T13:08:01.000Z",
-    },
-    {
-      id: 11,
-      name: "user1",
-      email: "user1@example.com",
-      password: "$2a$10$9cqt0UixqUIPCraM6jXvKezOMG5ANH7WGnmis0ddnSu7bbDCdM7iW",
-      isAdmin: 0,
-      image: "https://loremflickr.com/320/240?lock=2.7445859530035754",
-      createdAt: "2021-02-15T13:04:33.000Z",
-      updatedAt: "2021-02-15T13:04:33.000Z",
-    },
-    {
-      id: 21,
-      name: "user2",
-      email: "user2@example.com",
-      password: "$2a$10$4mK12LWzL/Tux72QN2NQVOk2YfctU6Ooe1uBAm/TyeGSbGEsoTalS",
-      isAdmin: 0,
-      image: "https://loremflickr.com/320/240?lock=74.59861446049072",
-      createdAt: "2021-02-15T13:04:34.000Z",
-      updatedAt: "2021-02-15T13:04:34.000Z",
-    },
-    {
-      id: 31,
-      name: "aaaTEST",
-      email: "aaat@aaa.com",
-      password: "$2a$10$9soLNtv.7NGEuc2hKnavkOuWrZY..US1mbRzXCkJFobHGBXr5g4BC",
-      isAdmin: 0,
-      image: null,
-      createdAt: "2021-02-18T07:48:10.000Z",
-      updatedAt: "2021-02-18T07:48:10.000Z",
-    },
-  ],
-};
-
-const dummyUser = {
-  currentUser: {
-    id: 1,
-    name: "root",
-    email: "root@example.com",
-    isAdmin: true,
-  },
-  isAuthenticated: true,
-};
+import adminAPI from "./../apis/admin";
+import { Toast } from "./../utils/helpers";
+import { mapState } from "vuex";
 
 export default {
   name: "AdminUsers",
@@ -104,23 +52,55 @@ export default {
   data() {
     return {
       users: [],
-      currentUser: dummyUser.currentUser,
     };
   },
+  computed: {
+    ...mapState(["currentUser"]),
+  },
   methods: {
-    fetchUsers() {
-      this.users = dummyData.users;
-    },
-    toggleUserRole({ userId, isAdmin }) {
-      this.users = this.users.map((user) => {
-        if (user.id === userId) {
-          return {
-            ...user,
-            isAdmin: !isAdmin,
-          };
+    async fetchUsers() {
+      try {
+        const { data } = await adminAPI.users.get();
+
+        if (data.status === "error") {
+          throw new Error(data.message);
         }
-        return user;
-      });
+
+        this.users = data.users;
+      } catch (err) {
+        Toast.fire({
+          icon: "error",
+          title: "Can not get users data. Try later.",
+        });
+      }
+    },
+    async toggleUserRole({ userId, isAdmin }) {
+      try {
+        const { data } = await adminAPI.users.update({ userId, isAdmin });
+
+        if (data.status === "error") {
+          throw new Error(data.message);
+        }
+
+        this.users = this.users.map((user) => {
+          if (user.id === userId) {
+            return {
+              ...user,
+              isAdmin: !isAdmin,
+            };
+          }
+          return user;
+        });
+        Toast.fire({
+          icon: "success",
+          title: "Update user role successed !",
+        });
+      } catch (err) {
+        Toast.fire({
+          icon: "error",
+          title: "Can not update user role. Try later.",
+        });
+      }
     },
   },
 };
