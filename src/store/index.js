@@ -15,6 +15,7 @@ export default new Vuex.Store({
       isAdmin: false,
     },
     isAuthenticated: false,
+    token: ''
   },
 
   // 修改 state 的方法, 使用 commit 
@@ -26,6 +27,13 @@ export default new Vuex.Store({
         ...currentUser
       }
       state.isAuthenticated = true
+      state.token = localStorage.getItem('token')
+    },
+    revokeAuthentication(state) {
+      state.currentUser = {}
+      state.isAuthenticated = false
+      state.token = '',
+      localStorage.removeItem('token')
     }
   },
 
@@ -46,8 +54,11 @@ export default new Vuex.Store({
           image, 
           isAdmin
         })        
+        return true
       } catch(err) {
         console.log('err msg', err)
+        commit('revokeAuthentication')
+        return false
       }
     }
   },  

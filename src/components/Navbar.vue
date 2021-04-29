@@ -1,6 +1,9 @@
 <template>
   <nav class="navbar navbar-expand-lg fixed-top navbar-light">
-    <router-link to="/" class="text-white navbar-brand btn btn-outline-info">
+    <router-link
+      to="/restaurants"
+      class="text-white navbar-brand btn btn-outline-info"
+    >
       餐廳評論網
     </router-link>
 
@@ -40,7 +43,11 @@
             </router-link>
           </p>
 
-          <button type="button" class="btn btn-outline-danger my-2 my-sm-0">
+          <button
+            @click="logout"
+            type="button"
+            class="btn btn-outline-danger my-2 my-sm-0"
+          >
             登出
           </button>
         </template>
@@ -51,10 +58,21 @@
 
 <script>
 import { mapState } from "vuex";
+import { Toast } from "./../utils/helpers";
 
 export default {
   computed: {
     ...mapState(["currentUser", "isAuthenticated"]),
+  },
+  methods: {
+    logout() {
+      this.$store.commit("revokeAuthentication");
+      this.$router.push("/signin");
+      Toast.fire({
+        icon: "success",
+        title: "Logout successed !",
+      });
+    },
   },
 };
 </script>
