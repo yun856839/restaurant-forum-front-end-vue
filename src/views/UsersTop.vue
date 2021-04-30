@@ -17,6 +17,7 @@
           <p class="mt-3">
             <button
               v-if="user.isFollowed"
+              :disabled="isProcessing"
               @click.prevent.stop="deleteFollowing(user.id)"
               type="button"
               class="btn btn-danger"
@@ -25,6 +26,7 @@
             </button>
             <button
               v-else
+              :disabled="isProcessing"
               @click.prevent.stop="addFollowing(user.id)"
               type="button"
               class="btn btn-primary"
@@ -56,6 +58,7 @@ export default {
     return {
       users: [],
       isLoading: true,
+      isProcessing: false,
     };
   },
   methods: {
@@ -81,6 +84,7 @@ export default {
     },
     async addFollowing(userId) {
       try {
+        this.isProcessing = true;
         const { data } = await usersAPI.addFollowing({ userId });
 
         if (data.status !== "success") {
@@ -98,7 +102,9 @@ export default {
             };
           }
         });
+        this.isProcessing = false;
       } catch (err) {
+        this.isProcessing = false;
         Toast.fire({
           icon: "error",
           title: "Can not add following. Try later.",
@@ -107,6 +113,7 @@ export default {
     },
     async deleteFollowing(userId) {
       try {
+        this.isProcessing = true;
         const { data } = await usersAPI.deleteFollowing({ userId });
 
         if (data.status !== "success") {
@@ -124,7 +131,9 @@ export default {
             };
           }
         });
+        this.isProcessing = false;
       } catch (err) {
+        this.isProcessing = false;
         Toast.fire({
           icon: "error",
           title: "Can not delete following. Try later.",

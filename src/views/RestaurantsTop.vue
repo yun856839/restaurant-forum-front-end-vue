@@ -36,6 +36,7 @@
 
               <button
                 v-if="rest.isFavorited"
+                :disabled="isProcessing"
                 @click.prevent.stop="deleteFavorite(rest.id)"
                 type="button"
                 class="btn btn-danger mr-2"
@@ -45,6 +46,7 @@
 
               <button
                 v-else
+                :disabled="isProcessing"
                 @click.prevent.stop="addFavorite(rest.id)"
                 type="button"
                 class="btn btn-primary"
@@ -77,6 +79,7 @@ export default {
     return {
       restaurants: [],
       isLoading: true,
+      isProcessing: false,
     };
   },
   created() {
@@ -100,6 +103,7 @@ export default {
     },
     async addFavorite(restaurantId) {
       try {
+        this.isProcessing = true;
         const { data } = await usersAPI.addFavorite({ restaurantId });
 
         if (data.status !== "success") {
@@ -118,7 +122,9 @@ export default {
             };
           })
           .sort((a, b) => b.FavoritedCounts - a.FavoritedCounts);
+        this.isProcessing = false;
       } catch (err) {
+        this.isProcessing = false;
         Toast.fire({
           icon: "error",
           title: "Can not add favorite. Try later.",
@@ -127,6 +133,7 @@ export default {
     },
     async deleteFavorite(restaurantId) {
       try {
+        this.isProcessing = true;
         const { data } = await usersAPI.deleteFavorite({ restaurantId });
 
         if (data.status !== "success") {
@@ -145,7 +152,9 @@ export default {
             };
           })
           .sort((a, b) => b.FavoritedCounts - a.FavoritedCounts);
+        this.isProcessing = false;
       } catch (err) {
+        this.isProcessing = false;
         Toast.fire({
           icon: "error",
           title: "Can not delete favorite. Try later.",

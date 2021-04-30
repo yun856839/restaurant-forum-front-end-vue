@@ -21,6 +21,7 @@
           <td>
             <button
               v-if="currentUser.id !== user.id"
+              :disabled="isProcessing"
               @click.prevent.stop="
                 toggleUserRole({ userId: user.id, isAdmin: user.isAdmin })
               "
@@ -56,6 +57,7 @@ export default {
     return {
       users: [],
       isLoading: true,
+      isProcessing: false,
     };
   },
   computed: {
@@ -83,6 +85,7 @@ export default {
     },
     async toggleUserRole({ userId, isAdmin }) {
       try {
+        this.isProcessing = true;
         const { data } = await adminAPI.users.update({ userId, isAdmin });
 
         if (data.status === "error") {
@@ -102,7 +105,9 @@ export default {
           icon: "success",
           title: "Update user role successed !",
         });
+        this.isProcessing = false;
       } catch (err) {
+        this.isProcessing = false;
         Toast.fire({
           icon: "error",
           title: "Can not update user role. Try later.",
