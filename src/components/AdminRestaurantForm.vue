@@ -1,5 +1,6 @@
 <template>
-  <form v-show="!isLoading" @submit.prevent.stop="handleSubmit">
+  <Spinner v-if="isLoading" />
+  <form v-else v-show="!isLoading" @submit.prevent.stop="handleSubmit">
     <div class="form-group">
       <label for="name">Name</label>
       <input
@@ -105,11 +106,15 @@
 </template>
 
 <script>
+import Spinner from "./../components/Spinner";
 import adminAPI from "./../apis/admin";
 import { Toast } from "./../utils/helpers";
 
 export default {
   name: "AdminRestaurantForm",
+  components: {
+    Spinner,
+  },
   props: {
     initialRestaurant: {
       type: Object,

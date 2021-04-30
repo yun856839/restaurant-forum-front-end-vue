@@ -1,5 +1,6 @@
 <template>
-  <table class="table">
+  <Spinner v-if="isLoading" />
+  <table v-else class="table">
     <thead class="thead-dark">
       <tr>
         <th scope="col">#</th>
@@ -45,13 +46,18 @@
 </template>
 
 <script>
+import Spinner from "./../components/Spinner";
 import adminAPI from "./../apis/admin";
 import { Toast } from "./../utils/helpers";
 
 export default {
+  components: {
+    Spinner,
+  },
   data() {
     return {
       restaurants: [],
+      isLoading: true,
     };
   },
   created() {
@@ -60,6 +66,7 @@ export default {
   methods: {
     async fetchRestaurants() {
       try {
+        this.isLoading = true;
         const { data } = await adminAPI.restaurants.get();
 
         if (data.status === "error") {
@@ -67,7 +74,9 @@ export default {
         }
 
         this.restaurants = data.data.restaurants;
+        this.isLoading = false;
       } catch (err) {
+        this.isLoading = false;
         Toast.fire({
           icon: "error",
           title: "Can not get restaurants data. Try later.",

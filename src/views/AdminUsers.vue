@@ -3,7 +3,8 @@
     <!-- AdminNav Component -->
     <AdminNav />
 
-    <table class="table">
+    <Spinner v-if="isLoading" />
+    <table v-else class="table">
       <thead class="thead-dark">
         <tr>
           <th scope="col">#</th>
@@ -36,6 +37,7 @@
 </template>
 
 <script>
+import Spinner from "./../components/Spinner";
 import AdminNav from "./../components/AdminNav";
 import adminAPI from "./../apis/admin";
 import { Toast } from "./../utils/helpers";
@@ -45,6 +47,7 @@ export default {
   name: "AdminUsers",
   components: {
     AdminNav,
+    Spinner,
   },
   created() {
     this.fetchUsers();
@@ -52,6 +55,7 @@ export default {
   data() {
     return {
       users: [],
+      isLoading: true,
     };
   },
   computed: {
@@ -60,6 +64,7 @@ export default {
   methods: {
     async fetchUsers() {
       try {
+        this.isLoading = true;
         const { data } = await adminAPI.users.get();
 
         if (data.status === "error") {
@@ -67,7 +72,9 @@ export default {
         }
 
         this.users = data.users;
+        this.isLoading = false;
       } catch (err) {
+        this.isLoading = false;
         Toast.fire({
           icon: "error",
           title: "Can not get users data. Try later.",

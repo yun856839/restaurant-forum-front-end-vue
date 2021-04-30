@@ -1,24 +1,29 @@
 <template>
   <div class="container py-5">
-    <!-- 餐廳資訊頁 RestaurantDetail -->
-    <RestaurantDetail :initial-restaurant="restaurant" />
+    <Spinner v-if="isLoading" />
 
-    <hr />
-    <!-- 餐廳評論 RestaurantComments -->
-    <RestaurantComments
-      :restaurantComments="restaurantComments"
-      @after-delete-comment="afterDeleteComment"
-    />
+    <template v-else>
+      <!-- 餐廳資訊頁 RestaurantDetail -->
+      <RestaurantDetail :initial-restaurant="restaurant" />
 
-    <!-- 新增評論 CreateComment -->
-    <CreateComment
-      :restaurant-id="restaurant.id"
-      @after-create-comment="afterCreateComment"
-    />
+      <hr />
+      <!-- 餐廳評論 RestaurantComments -->
+      <RestaurantComments
+        :restaurantComments="restaurantComments"
+        @after-delete-comment="afterDeleteComment"
+      />
+
+      <!-- 新增評論 CreateComment -->
+      <CreateComment
+        :restaurant-id="restaurant.id"
+        @after-create-comment="afterCreateComment"
+      />
+    </template>
   </div>
 </template>
 
 <script>
+import Spinner from "./../components/Spinner.vue";
 import RestaurantDetail from "./../components/RestaurantDetail";
 import RestaurantComments from "./../components/RestaurantComments";
 import CreateComment from "./../components/CreateComment";
@@ -32,6 +37,7 @@ export default {
     RestaurantDetail,
     RestaurantComments,
     CreateComment,
+    Spinner,
   },
   data() {
     return {
@@ -48,6 +54,7 @@ export default {
         isLiked: false,
       },
       restaurantComments: [],
+      isLoading: true,
     };
   },
   computed: {
@@ -61,6 +68,7 @@ export default {
   methods: {
     async fetchRestaurant(restaurantId) {
       try {
+        this.isLoading = true;
         const { data } = await restaurantsAPI.getRestaurant({ restaurantId });
 
         if (data.status === "error") {
@@ -94,7 +102,9 @@ export default {
         };
 
         this.restaurantComments = Comments;
+        this.isLoading = false;
       } catch (err) {
+        this.isLoading = false;
         Toast.fire({
           icon: "error",
           title: "Can not get restaurant data. Try later.",
