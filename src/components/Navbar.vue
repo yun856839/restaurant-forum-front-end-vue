@@ -77,7 +77,11 @@ export default {
 };
 </script>
 
-<style>
+<style scoped>
+.navbar-toggler {
+  min-width: 70px;
+  margin-right: 0;
+}
 .navbar {
   background: skyblue;
 }
