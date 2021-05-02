@@ -58,6 +58,7 @@ export default {
       prevPage: -1,
       nextPage: -1,
       isLoading: true,
+      downTime: "",
     };
   },
   methods: {
@@ -94,6 +95,40 @@ export default {
         });
       }
     },
+    async scrollFetchRestaurants({ queryPage, queryCategoryId }) {
+      try {
+        const res = await restaurantsAPI.getRestaurants({
+          page: queryPage,
+          categoryId: queryCategoryId,
+        });
+        const { restaurants, categoryId, page, totalPage } = res.data;
+        this.restaurants.push(...restaurants);
+        this.categoryId = categoryId;
+        this.currentPage = page;
+        this.totalPage = totalPage;
+      } catch (err) {
+        Toast.fire({
+          icon: "error",
+          title: "Can not get restaurants data. Try later.",
+        });
+      }
+    },
+    scroll() {
+      if (this.downTime) {
+        clearTimeout(this.downTime);
+      }
+      this.downTime = setTimeout(() => {
+        let scrollTop = document.documentElement.scrollTop;
+        let scrollHeight = document.documentElement.scrollHeight;
+        let windowHeight = document.documentElement.clientHeight;
+        if (scrollHeight - (scrollTop + windowHeight) <= 200) {
+          this.scrollFetchRestaurants({
+            queryPage: this.currentPage + 1,
+            queryCategoryId: this.categoryId,
+          });
+        }
+      }, 300);
+    },
   },
   created() {
     const { page = "", categoryId = "" } = this.$route.query;
@@ -109,6 +144,11 @@ export default {
       queryCategoryId: categoryId,
     });
     next();
+  },
+  mounted() {
+    window.addEventListener("scroll", () => {
+      this.scroll();
+    });
   },
 };
 </script>
